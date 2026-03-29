@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Add Shipment — CourierTrack{% endblock %}
+{% block page_title %}Add New Shipment{% endblock %}
+
+{% block content %}
+<div class="form-page">
+  <div class="card form-card">
+    <div class="card-header">
+      <h3><i class="fas fa-plus-circle"></i> New Shipment Details</h3>
+      <span class="hint-text"><i class="fas fa-info-circle"></i> Tracking ID is auto-generated</span>
+    </div>
+
+    <form method="POST" action="{{ url_for('add_shipment') }}" class="shipment-form">
+
+      <!-- Sender / Receiver Row -->
+      <div class="form-grid">
+        <div class="form-section">
+          <h4 class="section-title"><i class="fas fa-user-circle"></i> Sender Details</h4>
+          <div class="form-group">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" name="sender_name" placeholder="e.g. Alice Johnson" required/>
+          </div>
+          <div class="form-group">
+            <label>Contact Number</label>
+            <input type="text" name="sender_contact" placeholder="+1-555-0101"/>
+          </div>
+          <div class="form-group">
+            <label>Origin City / Address <span class="req">*</span></label>
+            <input type="text" name="origin" placeholder="e.g. New York, NY" required/>
+          </div>
+        </div>
+
+        <div class="divider-v"></div>
+
+        <div class="form-section">
+          <h4 class="section-title"><i class="fas fa-user-check"></i> Receiver Details</h4>
+          <div class="form-group">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" name="receiver_name" placeholder="e.g. Bob Smith" required/>
+          </div>
+          <div class="form-group">
+            <label>Contact Number</label>
+            <input type="text" name="receiver_contact" placeholder="+1-555-0202"/>
+          </div>
+          <div class="form-group">
+            <label>Destination City / Address <span class="req">*</span></label>
+            <input type="text" name="destination" placeholder="e.g. Los Angeles, CA" required/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Package Info -->
+      <div class="form-section mt-24">
+        <h4 class="section-title"><i class="fas fa-box"></i> Package Info</h4>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>Weight (kg)</label>
+            <input type="text" name="weight" placeholder="e.g. 2.5"/>
+          </div>
+          <div class="form-group">
+            <label>Contents / Description</label>
+            <input type="text" name="description" placeholder="e.g. Electronics, Documents"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="form-actions">
+        <a href="{{ url_for('manage_shipments') }}" class="btn-secondary">
+          <i class="fas fa-arrow-left"></i> Cancel
+        </a>
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-paper-plane"></i> Create Shipment
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

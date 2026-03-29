@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Update Status — CourierTrack{% endblock %}
+{% block page_title %}Update Shipment Status{% endblock %}
+
+{% block content %}
+<div class="update-layout">
+
+  <!-- ── LEFT: FORM ──────────────────────────────── -->
+  <div class="card update-form-card">
+    <div class="card-header">
+      <h3><i class="fas fa-pen-to-square"></i> Update Status</h3>
+      <span class="track-chip">{{ shipment.tracking_id }}</span>
+    </div>
+
+    <!-- Shipment info summary -->
+    <div class="shipment-summary">
+      <div class="summary-row">
+        <span><i class="fas fa-user"></i> Sender</span>
+        <strong>{{ shipment.sender_name }}</strong>
+      </div>
+      <div class="summary-row">
+        <span><i class="fas fa-user-check"></i> Receiver</span>
+        <strong>{{ shipment.receiver_name }}</strong>
+      </div>
+      <div class="summary-row">
+        <span><i class="fas fa-route"></i> Route</span>
+        <strong>{{ shipment.origin }} → {{ shipment.destination }}</strong>
+      </div>
+      <div class="summary-row">
+        <span><i class="fas fa-tag"></i> Current Status</span>
+        <span class="status-badge status-{{ shipment.status|replace(' ','_')|lower }}">
+          {{ shipment.status }}
+        </span>
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('update_status', shipment_id=shipment.id) }}">
+      <div class="form-group">
+        <label>New Status <span class="req">*</span></label>
+        <select name="status" class="filter-select full-w" required>
+          {% for s in ['Pending','Shipped','In Transit','Out for Delivery','Delivered'] %}
+          <option value="{{ s }}" {% if shipment.status == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Current Location</label>
+        <input type="text" name="location" placeholder="e.g. Chicago Distribution Hub"/>
+      </div>
+      <div class="form-group">
+        <label>Notes / Description</label>
+        <textarea name="notes" rows="3" placeholder="e.g. Package scanned at sorting facility…"></textarea>
+      </div>
+      <div class="form-actions">
+        <a href="{{ url_for('manage_shipments') }}" class="btn-secondary">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-check"></i> Save Update
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ── RIGHT: TIMELINE ─────────────────────────── -->
+  <div class="card timeline-card">
+    <div class="card-header">
+      <h3><i class="fas fa-timeline"></i> Tracking History</h3>
+    </div>
+    {% if history %}
+    <div class="timeline">
+      {% for h in history|reverse %}
+      <div class="tl-item {% if loop.first %}tl-latest{% endif %}">
+        <div class="tl-dot tl-dot-{{ h.status|replace(' ','_')|lower }}"></div>
+        <div class="tl-content">
+          <div class="tl-top">
+            <span class="status-badge status-{{ h.status|replace(' ','_')|lower }}">{{ h.status }}</span>
+            <span class="tl-time">{{ h.timestamp }}</span>
+          </div>
+          {% if h.location %}
+          <div class="tl-loc"><i class="fas fa-location-dot"></i> {{ h.location }}</div>
+          {% endif %}
+          {% if h.notes %}
+          <div class="tl-notes">{{ h.notes }}</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <div class="empty-state-small"><i class="fas fa-inbox"></i> No history yet.</div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login — CourierTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body class="login-page">
+
+<div class="login-split">
+  <!-- Left decorative panel -->
+  <div class="login-hero">
+    <div class="hero-content">
+      <div class="hero-logo"><i class="fas fa-truck-fast"></i></div>
+      <h1>Courier<strong>Track</strong></h1>
+      <p>Professional logistics management & real-time shipment tracking platform.</p>
+      <div class="hero-stats">
+        <div class="hstat"><span>99.8%</span><small>Delivery Rate</small></div>
+        <div class="hstat"><span>5K+</span><small>Shipments</small></div>
+        <div class="hstat"><span>24/7</span><small>Support</small></div>
+      </div>
+    </div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+  </div>
+
+  <!-- Right login form -->
+  <div class="login-form-panel">
+    <div class="login-card">
+      <div class="login-header">
+        <h2>Admin Portal</h2>
+        <p>Sign in to manage your shipments</p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="flash flash-{{ cat }}">
+              <i class="fas fa-circle-exclamation"></i> {{ msg }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+          <label>Username</label>
+          <div class="input-icon">
+            <i class="fas fa-user"></i>
+            <input type="text" name="username" placeholder="Enter username" required autocomplete="username"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password" id="pwInput" placeholder="Enter password" required autocomplete="current-password"/>
+            <button type="button" class="pw-toggle" onclick="togglePw()"><i class="fas fa-eye" id="pwEye"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn-login">
+          <i class="fas fa-right-to-bracket"></i> Sign In
+        </button>
+      </form>
+
+      <div class="login-hint">
+        <i class="fas fa-info-circle"></i>
+        Default credentials: <code>admin</code> / <code>admin123</code>
+      </div>
+
+      <a href="{{ url_for('track') }}" class="track-link">
+        <i class="fas fa-location-dot"></i> Track a package without logging in
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePw() {
+  const i = document.getElementById('pwInput');
+  const e = document.getElementById('pwEye');
+  if (i.type === 'password') { i.type = 'text'; e.className = 'fas fa-eye-slash'; }
+  else { i.type = 'password'; e.className = 'fas fa-eye'; }
+}
+</script>
+</body>
+</html>

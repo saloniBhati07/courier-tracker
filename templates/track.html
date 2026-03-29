@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Track Your Package — CourierTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body class="track-public-page">
+
+<!-- Minimal nav -->
+<nav class="track-nav">
+  <div class="track-nav-logo">
+    <i class="fas fa-truck-fast"></i> Courier<strong>Track</strong>
+  </div>
+  <a href="{{ url_for('login') }}" class="btn-secondary btn-sm">
+    <i class="fas fa-lock"></i> Admin Login
+  </a>
+</nav>
+
+<div class="track-hero">
+  <div class="track-hero-text">
+    <h1>Track Your Shipment</h1>
+    <p>Enter your tracking ID to get real-time delivery updates</p>
+  </div>
+
+  <!-- Search Box -->
+  <form method="GET" action="{{ url_for('track') }}" class="track-search-box">
+    <div class="track-input-wrap">
+      <i class="fas fa-barcode"></i>
+      <input type="text" name="tracking_id"
+             placeholder="Enter Tracking ID (e.g. TRK001DEMO)"
+             value="{{ tracking_id }}" autofocus/>
+    </div>
+    <button type="submit" class="btn-primary btn-track">
+      <i class="fas fa-magnifying-glass"></i> Track
+    </button>
+  </form>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }} flash-center">
+          <i class="fas fa-circle-exclamation"></i> {{ msg }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+
+{% if shipment %}
+<div class="track-result">
+
+  <!-- ── SHIPMENT CARD ──────────────────────────── -->
+  <div class="track-card">
+    <div class="track-card-header">
+      <div>
+        <div class="track-id-label">Tracking ID</div>
+        <div class="track-id-value">{{ shipment.tracking_id }}</div>
+      </div>
+      <span class="status-badge status-{{ shipment.status|replace(' ','_')|lower }} status-lg">
+        {{ shipment.status }}
+      </span>
+    </div>
+
+    <!-- Progress bar -->
+    {% set steps = ['Pending','Shipped','In Transit','Out for Delivery','Delivered'] %}
+    {% set step_idx = steps.index(shipment.status) if shipment.status in steps else 0 %}
+    <div class="progress-track">
+      {% for step in steps %}
+      {% set i = loop.index0 %}
+      <div class="progress-step {% if i <= step_idx %}done{% endif %} {% if i == step_idx %}current{% endif %}">
+        <div class="progress-dot">
+          <i class="fas {% if i < step_idx %}fa-check{% elif i == step_idx %}fa-circle-dot{% else %}fa-circle{% endif %}"></i>
+        </div>
+        <span>{{ step }}</span>
+      </div>
+      {% if not loop.last %}
+      <div class="progress-line {% if i < step_idx %}done{% endif %}"></div>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Shipment details grid -->
+    <div class="track-details">
+      <div class="track-detail-item">
+        <i class="fas fa-user"></i>
+        <div><label>Sender</label><strong>{{ shipment.sender_name }}</strong></div>
+      </div>
+      <div class="track-detail-item">
+        <i class="fas fa-user-check"></i>
+        <div><label>Receiver</label><strong>{{ shipment.receiver_name }}</strong></div>
+      </div>
+      <div class="track-detail-item">
+        <i class="fas fa-location-arrow"></i>
+        <div><label>From</label><strong>{{ shipment.origin }}</strong></div>
+      </div>
+      <div class="track-detail-item">
+        <i class="fas fa-location-dot"></i>
+        <div><label>To</label><strong>{{ shipment.destination }}</strong></div>
+      </div>
+      <div class="track-detail-item">
+        <i class="fas fa-weight-hanging"></i>
+        <div><label>Weight</label><strong>{{ shipment.weight or 'N/A' }}</strong></div>
+      </div>
+      <div class="track-detail-item">
+        <i class="fas fa-calendar"></i>
+        <div><label>Created</label><strong>{{ shipment.created_at[:10] }}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TIMELINE ───────────────────────────────── -->
+  {% if history %}
+  <div class="track-timeline-card">
+    <h3><i class="fas fa-timeline"></i> Delivery Timeline</h3>
+    <div class="timeline">
+      {% for h in history|reverse %}
+      <div class="tl-item {% if loop.first %}tl-latest{% endif %}">
+        <div class="tl-dot tl-dot-{{ h.status|replace(' ','_')|lower }}"></div>
+        <div class="tl-content">
+          <div class="tl-top">
+            <span class="status-badge status-{{ h.status|replace(' ','_')|lower }}">{{ h.status }}</span>
+            <span class="tl-time">{{ h.timestamp }}</span>
+          </div>
+          {% if h.location %}
+          <div class="tl-loc"><i class="fas fa-location-dot"></i> {{ h.location }}</div>
+          {% endif %}
+          {% if h.notes %}
+          <div class="tl-notes">{{ h.notes }}</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endif %}
+
+<!-- Demo hint -->
+{% if not shipment %}
+<div class="track-hint-box">
+  <h4><i class="fas fa-lightbulb"></i> Demo Tracking IDs</h4>
+  <div class="demo-ids">
+    {% for tid in ['TRK001DEMO','TRK002DEMO','TRK003DEMO','TRK004DEMO','TRK005DEMO'] %}
+    <a href="{{ url_for('track') }}?tracking_id={{ tid }}" class="demo-chip">{{ tid }}</a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<script>
+// Jinja enumerate workaround
+</script>
+</body>
+</html>

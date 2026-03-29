@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}CourierTrack{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+{% block full_page %}
+<!-- Sidebar + Main layout -->
+<div class="app-shell">
+
+  <!-- ── SIDEBAR ──────────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon"><i class="fas fa-truck-fast"></i></span>
+      <span class="logo-text">Courier<b>Track</b></span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-gauge-high"></i><span>Dashboard</span>
+      </a>
+      <a href="{{ url_for('add_shipment') }}" class="nav-item {% if request.endpoint == 'add_shipment' %}active{% endif %}">
+        <i class="fas fa-plus-circle"></i><span>Add Shipment</span>
+      </a>
+      <a href="{{ url_for('manage_shipments') }}" class="nav-item {% if request.endpoint == 'manage_shipments' %}active{% endif %}">
+        <i class="fas fa-boxes-stacked"></i><span>Manage Shipments</span>
+      </a>
+      <a href="{{ url_for('track') }}" class="nav-item {% if request.endpoint == 'track' %}active{% endif %}">
+        <i class="fas fa-location-dot"></i><span>Track Package</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="admin-badge">
+        <i class="fas fa-circle-user"></i>
+        <span>{{ session.get('admin_username','Admin') }}</span>
+      </div>
+      <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-right-from-bracket"></i> Logout</a>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ──────────────────────────── -->
+  <main class="main-content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+      <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+      <div class="topbar-right">
+        <span class="topbar-date" id="topbar-date"></span>
+      </div>
+    </header>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for cat, msg in messages %}
+            <div class="flash flash-{{ cat }}">
+              <i class="fas {% if cat == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i>
+              {{ msg }}
+              <button onclick="this.parentElement.remove()" class="flash-close">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="page-body">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
